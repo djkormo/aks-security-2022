@@ -247,6 +247,8 @@ then
         --network-policy calico \
         --enable-aad --aad-admin-group-object-ids $GROUP_ID --aad-tenant-id $TENANT_ID
 
+      # Enable azure policy for aks 
+      az aks enable-addons -g $AKS_RG -n $AKS_NAME --addons azure-policy
 
    echo "ACR_NAME: $ACR_NAME"
    # create Azure Container Registry 
