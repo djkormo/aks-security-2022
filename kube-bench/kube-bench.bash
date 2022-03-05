@@ -152,7 +152,7 @@ spec:
     spec:
       hostPID: true
       nodeSelector:
-        node-role.kubernetes.io/master: ""
+        node-role.kubernetes.io/agent: ""
       tolerations:
       - key: "node-role.kubernetes.io/master"
         value: ""
