@@ -1,0 +1,30 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kube-hunter
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+        - name: kube-hunter
+          image: aquasec/kube-hunter
+          command: ["kube-hunter"]
+          args: ["--pod","--active","--log", "INFO","--quick"]
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+              - all
+              
+      restartPolicy: Never
+
+
+#        privileged: false
+#        readOnlyRootFilesystem: true
+#        runAsNonRoot: true
+
+  backoffLimit: 4

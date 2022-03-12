@@ -13,7 +13,7 @@ az account list -o table
 az account set -s <subscription id>
 az aks list -o table
 
-az aks get-credentials -g aks-rg -n aks-security2021 --admin
+az aks get-credentials -g aks-rg -n aks-security2022 --admin --overwrite-existing
 
 kubectl create ns demo
 
@@ -45,7 +45,7 @@ helm install istiod istio/istiod -n istio-system --wait
 
 kubectl get ns
 
-aks-hc check all -g aks-rg -n aks-security2021 \
+aks-hc check all -g aks-rg -n aks-security2022 \
   -i ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,calico-system,gatekeeper-system -v
 
 exit
