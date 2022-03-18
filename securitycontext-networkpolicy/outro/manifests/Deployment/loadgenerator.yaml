@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgenerator
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      labels:
+        app: loadgenerator
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+      - env:
+        - name: FRONTEND_ADDR
+          value: frontend:80
+        - name: USERS
+          value: "10"
+        image: gcr.io/google-samples/microservices-demo/loadgenerator:v0.1.4
+        imagePullPolicy: Always
+        name: main
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 300m
+            memory: 256Mi
+        securityContext:
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - all
+
+      restartPolicy: Always
+
+
+#        securityContext:
+#        #  runAsNonRoot: true 
+#          readOnlyRootFilesystem: true
+#          allowPrivilegeEscalation: false
+#          capabilities:
+#            drop:
+#              - all
+      terminationGracePeriodSeconds: 5

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cart
+spec:
+  selector:
+    matchLabels:
+      app: redis-cart
+  template:
+    metadata:
+      labels:
+        app: redis-cart
+    spec:
+      containers:
+      - image: redis:alpine
+        imagePullPolicy: Always
+        livenessProbe:
+          periodSeconds: 5
+          tcpSocket:
+            port: 6379
+        name: redis
+        ports:
+        - containerPort: 6379
+        readinessProbe:
+          periodSeconds: 5
+          tcpSocket:
+            port: 6379
+        resources:
+          limits:
+            cpu: 125m
+            memory: 256Mi
+          requests:
+            cpu: 70m
+            memory: 200Mi
+        securityContext:
+          runAsNonRoot: false
+          readOnlyRootFilesystem: false  #chown: .: Operation not permitted
+          allowPrivilegeEscalation: false
+#          capabilities:
+#            drop:
+#              - all
+
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      volumes:
+      - emptyDir: {}
+        name: redis-data
+
+#    securityContext:
+#      #  runAsNonRoot: true 
+#      readOnlyRootFilesystem: true
+#      allowPrivilegeEscalation: false
+#      capabilities:
+#        drop:
+#          - all
+

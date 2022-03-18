@@ -1,0 +1,329 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: traces.gadget.kinvolk.io
+spec:
+  group: gadget.kinvolk.io
+  names:
+    kind: Trace
+    listKind: TraceList
+    plural: traces
+    singular: trace
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Trace is the Schema for the traces API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: TraceSpec defines the desired state of Trace
+            properties:
+              filter:
+                description: Filter is to tell the gadget to filter events based on
+                  namespace, pod name, labels or container name
+                properties:
+                  containerName:
+                    description: ContainerName selects events from containers with
+                      this name
+                    type: string
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: Labels selects events from pods with these labels
+                    type: object
+                  namespace:
+                    description: Namespace selects events from this pod namespace
+                    type: string
+                  podname:
+                    description: Podname selects events from this pod name
+                    type: string
+                type: object
+              gadget:
+                description: Gadget is the name of the gadget such as "seccomp"
+                type: string
+              node:
+                description: Node is the name of the node on which this trace should
+                  run
+                type: string
+              output:
+                description: Output allows a gadget to output the results in the specified
+                  location. * With OutputMode=Status|Stream, Output is unused * With
+                  OutputMode=File, Output specifies the file path * With OutputMode=ExternalResource,
+                  Output specifies the external   resource (such as   seccompprofiles.security-profiles-operator.x-k8s.io
+                  for the   seccomp gadget)
+                type: string
+              outputMode:
+                description: OutputMode is "Status", "Stream", "File" or "ExternalResource"
+                enum:
+                - Status
+                - Stream
+                - File
+                - ExternalResource
+                type: string
+              runMode:
+                description: RunMode is "Auto" to automatically start the trace as
+                  soon as the resource is created, or "Manual" to be controlled by
+                  the "gadget.kinvolk.io/operation" annotation
+                type: string
+            type: object
+          status:
+            description: TraceStatus defines the observed state of Trace
+            properties:
+              operationError:
+                description: OperationError is the error returned by the gadget when
+                  applying the annotation gadget.kinvolk.io/operation=
+                type: string
+              operationWarning:
+                description: OperationWarning is returned by the gadget to notify
+                  about a malfunction when applying the annotation gadget.kinvolk.io/operation=.
+                  Unlike the OperationError that represents a fatal error, the OperationWarning
+                  could be ignored according to the context.
+                type: string
+              output:
+                description: Output is the output of the gadget
+                type: string
+              state:
+                description: State is "Started", "Stopped" or "Completed"
+                enum:
+                - Started
+                - Stopped
+                - Completed
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gadget
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gadget
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: gadget
+subjects:
+- kind: ServiceAccount
+  name: gadget
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: gadget
+  namespace: kube-system
+  labels:
+    k8s-app: gadget
+spec:
+  selector:
+    matchLabels:
+      k8s-app: gadget
+  template:
+    metadata:
+      labels:
+        k8s-app: gadget
+      annotations:
+        # We need to set gadget container as unconfined so it is able to write
+        # /sys/fs/bpf as well as /sys/kernel/debug/tracing.
+        # Otherwise, we can have error like:
+        # "failed to create server failed to create folder for pinning bpf maps: mkdir /sys/fs/bpf/gadget: permission denied"
+        # (For reference, see: https://github.com/kinvolk/inspektor-gadget/runs/3966318270?check_suite_focus=true#step:20:221)
+        container.apparmor.security.beta.kubernetes.io/gadget: "unconfined"
+        inspektor-gadget.kinvolk.io/option-hook-mode: "auto"
+    spec:
+      serviceAccount: gadget
+      hostPID: true
+      hostNetwork: true
+      containers:
+      - name: gadget
+        image: docker.io/kinvolk/gadget:v0.4.2
+        imagePullPolicy: Always
+        command: [ "/entrypoint.sh" ]
+        lifecycle:
+          preStop:
+            exec:
+              command:
+                - "/cleanup.sh"
+
+        livenessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          exec:
+            command:
+              - /bin/gadgettracermanager
+              - -liveness
+
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: GADGET_POD_UID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.uid
+          - name: TRACELOOP_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: TRACELOOP_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: TRACELOOP_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: GADGET_IMAGE
+            value: docker.io/kinvolk/gadget:v0.4.2
+          - name: INSPEKTOR_GADGET_VERSION
+            value: v0.4.2
+          - name: INSPEKTOR_GADGET_OPTION_HOOK_MODE
+            value: "auto"
+          - name: INSPEKTOR_GADGET_OPTION_TOOLS_MODE
+            value: "standard"
+          - name: INSPEKTOR_GADGET_OPTION_FALLBACK_POD_INFORMER
+            value: "true"
+        securityContext:
+          capabilities:
+            add:
+              # We need CAP_NET_ADMIN to be able to create BPF link.
+              # Indeed, link_create is called with prog->type which equals
+              # BPF_PROG_TYPE_CGROUP_SKB.
+              # This value is then checked in
+              # bpf_prog_attach_check_attach_type() which also checks if we have
+              # CAP_NET_ADMIN:
+              # https://elixir.bootlin.com/linux/v5.14.14/source/kernel/bpf/syscall.c#L4099
+              # https://elixir.bootlin.com/linux/v5.14.14/source/kernel/bpf/syscall.c#L2967
+              - NET_ADMIN
+
+              # We need CAP_SYS_ADMIN to use Python-BCC gadgets because bcc
+              # internally calls bpf_get_map_fd_by_id() which contains the
+              # following snippet:
+              # if (!capable(CAP_SYS_ADMIN))
+              # 	return -EPERM;
+              # (https://elixir.bootlin.com/linux/v5.10.73/source/kernel/bpf/syscall.c#L3254)
+              #
+              # Details about this are given in:
+              # > The important design decision is to allow ID->FD transition for
+              # CAP_SYS_ADMIN only. What it means that user processes can run
+              # with CAP_BPF and CAP_NET_ADMIN and they will not be able to affect each
+              # other unless they pass FDs via scm_rights or via pinning in bpffs.
+              # ID->FD is a mechanism for human override and introspection.
+              # An admin can do 'sudo bpftool prog ...'. It's possible to enforce via LSM that
+              # only bpftool binary does bpf syscall with CAP_SYS_ADMIN and the rest of user
+              # space processes do bpf syscall with CAP_BPF isolating bpf objects (progs, maps,
+              # links) that are owned by such processes from each other.
+              # (https://lwn.net/Articles/820560/)
+              #
+              # Note that even with a kernel providing CAP_BPF, the above
+              # statement is still true.
+              - SYS_ADMIN
+
+              # We need this capability to get addresses from /proc/kallsyms.
+              # Without it, addresses displayed when reading this file will be
+              # 0.
+              # Thus, bcc_procutils_each_ksym will never call callback, so KSyms
+              # syms_ vector will be empty and it will return false.
+              # As a consequence, no prefix will be found in
+              # get_syscall_prefix(), so a default prefix (_sys) will be
+              # returned.
+              # Sadly, this default prefix is not used by the running kernel,
+              # which instead uses: __x64_sys_
+              - SYSLOG
+
+              # traceloop gadget uses strace which in turns use ptrace()
+              # syscall.
+              # Within kernel code, ptrace() calls ptrace_attach() which in
+              # turns calls __ptrace_may_access() which calls ptrace_has_cap()
+              # where CAP_SYS_PTRACE is finally checked:
+              # https://elixir.bootlin.com/linux/v5.14.14/source/kernel/ptrace.c#L284
+              - SYS_PTRACE
+
+              # Needed by setrlimit in gadgettracermanager.
+              - SYS_RESOURCE
+
+              # Needed for gadgets that don't dumb the memory rlimit.
+              # (Currently only applies to BCC python-based gadgets)
+              - IPC_LOCK
+        volumeMounts:
+        - name: host
+          mountPath: /host
+        - name: run
+          mountPath: /run
+        - name: modules
+          mountPath: /lib/modules
+        - name: debugfs
+          mountPath: /sys/kernel/debug
+        - name: cgroup
+          mountPath: /sys/fs/cgroup
+        - name: bpffs
+          mountPath: /sys/fs/bpf
+        - name: localtime
+          mountPath: /etc/localtime
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+      volumes:
+      - name: host
+        hostPath:
+          path: /
+      - name: run
+        hostPath:
+          path: /run
+      - name: cgroup
+        hostPath:
+          path: /sys/fs/cgroup
+      - name: modules
+        hostPath:
+          path: /lib/modules
+      - name: bpffs
+        hostPath:
+          path: /sys/fs/bpf
+      - name: debugfs
+        hostPath:
+          path: /sys/kernel/debug
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
