@@ -1,0 +1,239 @@
+               Downloading Infrastructure Data               
+Fetching cluster information...
+
+               Scanning Development Items               
+Checking for Azure Managed Identity for pods...
+
+               Scanning Cluster Setup Items               
+Checking for authorized ip ranges...
+EXCEPTION: TypeError: Cannot read property 'authorizedIpRanges' of null
+Checking for Managed Azure Active Directory integration...
+Checking for Autoscale on cluster...
+Checking for multiple node pools on cluster...
+Checking for Azure Policy on cluster...
+Checking for Azure Active Directory RBAC...
+
+               Scanning Disaster Recovery Items               
+Checking for agent pools without multiple availability zones...
+Checking for SLA for control plane...
+
+               Scanning Image Management Items               
+Checking for private endpoints on container registries...
+Checking for ACR/AKS RBAC integration for pulling images...
+Fetching all namespaces...
+Fetching all pods...
+Fetching all deployments...
+Fetching all services...
+Fetching all config maps...
+Fetching all secrets...
+Fetching all Horizontal Pod AutoScalers...
+Fetching all Constraint Templates...
+Fetching all Pod Disruption Budgets...
+Fetching all Network Policies...
+
+               Scanning Development Items               
+Checking for liveness probes...
+Checking for readiness probes...
+Checking for startup probes...
+Checking for preStop hooks...
+Checking for single replica deployments...
+Checking for resources without labels or annotations...
+Checking for namespaces without Horizontal Pod Autoscalers...
+Checking for Azure secrets store provider...
+Checking for pods in default namespace...
+Checking for pods without resource requests/limits...
+Checking for pods with default security context...
+Checking for pod disruption budgets...
+
+               Scanning Image Management Items               
+Checking for 'Only use allowed images' policy...
+Checking for 'No privileged containers' policy...
+--- 'No privileged containers' policy applied
+Checking for runtime container security tools...
+
+               Scanning Cluster Setup Items               
+Checking for Kubernetes dashboard...
+
+               Scanning Disaster Recovery Items               
+Checking for Velero...
+
+               Scanning Networking Items               
+Checking for known service meshes...
+Checking for networking policies...
+
+                                                              
+
+  
+                .,,,,* ,,,,,                                  
+                .,,,,, ,,,,,                                                        
+          ,,,,,..,,,,, ,,,,, ,,,,,                            
+          ,,,,,..,,,,* ,,,,, ,,,,,                            
+    ,,,,, ,,,,,..,,,,, ,,,,, ,,,,, ,,,,,,                     
+    ,,,,, ,,,,,..,,,*(%(,,,, ,,,,, ,,,,,,                     
+                /((((((%%%%%%%,                                
+    ,,,,,,((((((((((((%%%%%%%%%%%%#*,,,,,                     
+    .((((((((((((((((((%%%%%%%%%%%%%%%%%%/                     
+((((((((((((((((((((((%%%%%%%%%%%%%%%%%%%%%%.                 
+  #((((((((((((((((((((%%%%%%%%%%%%%%%%%%%%%,                  
+    ((((((((((((((((((((%%%%%%%%%%%%%%%%%%%%                    
+    ,((((((((((((((((((%%%%%%%%%%%%%%%%%%%                     
+      (((((((((((((((((%%%%%%%%%%%%%%%%%#                      
+      ((((((((((((((((%%%%%%%%%%%%%%%%(                       
+        #(((((#((((((((%%%%%%%%%%%%%%%,                        
+    ,,, /#, ,,, .##  ,,, /%# .,,. #%  ,,,   
+
+  BoxBoat's AKS Health Check Results
+  Total checks that passed: 8/29 => 28%
+  Total checks that failed: 19/29
+
+  But, there are still 30 checks that need to be performed manually. 
+  Here's the document we use at BoxBoat 📄 https://bit.ly/boxboat-health-check-report-template-v2 
+  Copy it, it should help you keep track of everything.
+  
+                                                              
+
+1. DEV-1 | FAIL - Implement a proper liveness probe
+    +------ Found 2 pods without liveness probes
+            demo/loadgenerator-7947764c98-pxwrc
+            demo/nginx-deployment-6fcdb8cc74-l99bw
+2. DEV-2 | FAIL - Implement a proper readiness/startup probe
+    +------ Found 2 pods without readiness probes
+            demo/loadgenerator-7947764c98-pxwrc
+            demo/nginx-deployment-6fcdb8cc74-l99bw
+3. DEV-2B | FAIL - Implement a proper startup probes
+    +------ Found 14 pods without startup probes
+            demo/adservice-9b8f74fbb-fjjzc
+            demo/cartservice-5db74d749f-wp2kc
+            demo/checkoutservice-7d4854d84d-gt786
+            demo/currencyservice-66875bb748-nkrkn
+            demo/emailservice-cdb74dc86-7q8j8
+            demo/frontend-6dcbf455db-zlhd5
+            demo/loadgenerator-7947764c98-pxwrc
+            demo/nginx-deployment-6fcdb8cc74-l99bw
+            demo/paymentservice-56f598cc65-vnzkd
+            demo/productcatalogservice-78c7f4d74-pwrcn
+            demo/recommendationservice-8656895f68-8qd2w
+            demo/redis-cart-6fb887bbf6-4mnxq
+            demo/redis-cart-d65547c8f-c57kr
+            demo/shippingservice-64587c864b-4pr28
+4. DEV-3 | FAIL - Implement a proper prestop hook
+    +------ Found 14 pods without preStop hooks
+            demo/adservice-9b8f74fbb-fjjzc
+            demo/cartservice-5db74d749f-wp2kc
+            demo/checkoutservice-7d4854d84d-gt786
+            demo/currencyservice-66875bb748-nkrkn
+            demo/emailservice-cdb74dc86-7q8j8
+            demo/frontend-6dcbf455db-zlhd5
+            demo/loadgenerator-7947764c98-pxwrc
+            demo/nginx-deployment-6fcdb8cc74-l99bw
+            demo/paymentservice-56f598cc65-vnzkd
+            demo/productcatalogservice-78c7f4d74-pwrcn
+            demo/recommendationservice-8656895f68-8qd2w
+            demo/redis-cart-6fb887bbf6-4mnxq
+            demo/redis-cart-d65547c8f-c57kr
+            demo/shippingservice-64587c864b-4pr28
+5. DEV-4 | FAIL - Run more than one replica for your deployments
+    +------ Found 14 deployments with a single replica
+            default/nginx-deployment
+            demo/adservice
+            demo/cartservice
+            demo/checkoutservice
+            demo/currencyservice
+            demo/emailservice
+            demo/frontend
+            demo/loadgenerator
+            demo/nginx-deployment
+            demo/paymentservice
+            demo/productcatalogservice
+            demo/recommendationservice
+            demo/redis-cart
+            demo/shippingservice
+6. DEV-5 | PASS - Apply tags to all resources
+    +------ All resources have labels or annotations
+7. DEV-6 | FAIL - Implement autoscaling of your applications
+    +------ Found 1 namespaces without any Horizontal Pod Autoscalers
+            demo
+8. DEV-7 | FAIL - Store secrets in azure key vault
+    +------ Azure Secrets Store Provider was not found in the cluster
+9. DEV-8 | INSPECTION REQUIRED - Implement pod identity
+10. DEV-9 | PASS - Use kubernetes namespaces
+    +------ No pods running in default namespace
+11. DEV-10 | FAIL - Setup resource requests and limits on containers
+    +------ Found 1 pods without either resource requests or limits
+            demo/nginx-deployment-6fcdb8cc74-l99bw
+12. DEV-11 | FAIL - Specify security context for pods or containers
+    +------ Found 1 pods using the default security context
+            demo/nginx-deployment-6fcdb8cc74-l99bw
+13. DEV-12 | FAIL - Configure pod disruption budgets
+    +------ No pod disruption budgets were found
+14. IMG-1 | INSPECTION REQUIRED - Define image security best practices
+15. IMG-2 | INSPECTION REQUIRED - Scan container images during CI/CD pipelines
+16. IMG-3 | PASS - Allow pulling containers only from allowed registries
+    +------ 'Only use allowed images' policy applied
+17. IMG-4 | FAIL - Enable runtime security for containerized applications
+    +------ A runtime container security tool was not found
+18. IMG-5 | PASS - Configure image pull RBAC for azure container registry
+    +------ All registries have AKS/ACR RBAC integration
+19. IMG-6 | N/A - Isolate azure container registries
+20. IMG-7 | INSPECTION REQUIRED - Utilize minimal base images
+21. IMG-8 | PASS - Forbid the use of privileged containers
+    +------ No privileged containers' policy applied
+22. CSP-1 | INSPECTION REQUIRED - Logically isolate the cluster
+23. CSP-2 | N/A - Isolate the Kubernetes control plane
+24. CSP-3 | PASS - Enable Azure AD integration
+    +------ Managed Azure Active Direectory integration is configured
+25. CSP-4 | FAIL - Enable cluster autoscaling
+    +------ Autoscale is not configured
+26. CSP-5 | INSPECTION REQUIRED - Ensure nodes are correctly sized
+27. CSP-6 | INSPECTION REQUIRED - Create a process for base image updates
+28. CSP-7 | PASS - Ensure the Kubernetes dashboard is not installed
+    +------ Kubernetes dashboard is not installed
+29. CSP-8 | FAIL - Use system and user node pools
+    +------ Only one node pool exists on the cluster
+30. CSP-9 | FAIL - Enable Azure Policy
+    +------ Azure Policy is not enabled
+31. CSP-10 | FAIL - Enable Azure RBAC
+    +------ Azure Active Directory RBAC is not configured
+32. DR-1 | INSPECTION REQUIRED - Ensure you can perform a whitespace deployment
+33. DR-2 | FAIL - Use availability zones for node pools
+    +------ Found 1 agent pools without multiple availability zones
+            nodepool1
+34. DR-3 | INSPECTION REQUIRED - Plan for a multi-region deployment
+35. DR-4 | INSPECTION REQUIRED - Use Azure traffic manager for cross-region traffic
+36. DR-5 | FAIL - Create a storage migration plan
+    +------ Velero is not installed
+37. DR-6 | FAIL - Guarantee SLA for the master control plane
+    +------ An SLA has not been configured for the control plane
+38. DR-7 | INSPECTION REQUIRED - Container registry has geo-replication
+39. STOR-1 | INSPECTION REQUIRED - Choose the right storage type
+40. STOR-2 | INSPECTION REQUIRED - Size nodes for storage needs
+41. STOR-3 | INSPECTION REQUIRED - Dynamically provision volumes when applicable
+42. STOR-4 | INSPECTION REQUIRED - Secure and back up your data
+43. STOR-5 | INSPECTION REQUIRED - Remove service state from inside containers
+44. NET-1 | INSPECTION REQUIRED - Choose an appropriate network model
+45. NET-2 | INSPECTION REQUIRED - Plan IP addressing carefully
+46. NET-3 | INSPECTION REQUIRED - Distribute ingress traffic
+47. NET-4 | INSPECTION REQUIRED - Secure exposed endpoints with a Web Application Firewall (WAF)
+48. NET-5 | INSPECTION REQUIRED - Dont expose ingress on public internet if not necessary
+49. NET-6 | PASS - Control traffic flow with network policies
+    +------ Found 9 network policies
+            demo/cartservice-network
+            demo/checkoutservice-network
+            demo/currencyservice-network
+            demo/emailservice-network
+            demo/frontend-network
+            demo/paymentservice-network
+            demo/productcatalogservice-network
+            demo/redis-cart-network
+            demo/shippingservice-network
+50. NET-7 | INSPECTION REQUIRED - Route egress traffic through a firewall
+51. NET-8 | INSPECTION REQUIRED - Do not expose worker nodes to public internet
+52. NET-9 | FAIL - Utilize a service mesh (optional)
+    +------ No service mesh installed
+53. NET-10 | INSPECTION REQUIRED - Configure distributed tracing
+54. CSM-1 | INSPECTION REQUIRED - Keep Kubernetes version up to date
+55. CSM-2 | INSPECTION REQUIRED - Keep nodes up to date and patched
+56. CSM-3 | INSPECTION REQUIRED - Monitor cluster security using Azure Security Center
+57. CSM-4 | INSPECTION REQUIRED - Provision a log aggregation tool
+58. CSM-5 | INSPECTION REQUIRED - Enable master node logs
+59. CSM-6 | INSPECTION REQUIRED - Collect metrics

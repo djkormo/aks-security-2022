@@ -1,12 +1,10 @@
 ```
-docker run -it --network host --rm ghcr.io/boxboat/aks-health-check \
-  --mount type=bind,source=./logs,target=/logs 
-
-  docker run -it --network host --rm ghcr.io/boxboat/aks-health-check \
-    -v ,source={$pwd}/logs,target=/logs  
+docker run -it --network host --rm ghcr.io/boxboat/aks-health-check  
 ```
 
+```
 # Shell in the container
+```
 ```
 az login
 az account list -o table
@@ -14,6 +12,20 @@ az account set -s <subscription id>
 az aks list -o table
 
 az aks get-credentials -g aks-rg -n aks-security2022 --admin --overwrite-existing
+
+aks-hc check all -g aks-rg -n aks-security2022 \
+  -i ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,calico-system,gatekeeper-system -v
+
+aks-hc check all -g aks-rg -n aks-security2022 \
+  -i ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,calico-system,gatekeeper-system -v >> logs/aks.log
+
+
+bash bash/run-aks-heath-check.bash -n aks-security2022 -g aks-rg  -i "ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,gatekeeper-system" -l "logs/aks.log"
+
+exit
+```
+
+
 
 kubectl create ns demo
 
@@ -42,15 +54,6 @@ helm install istiod istio/istiod -n istio-system --wait
 ```
 
 
-
-kubectl get ns
-
-aks-hc check all -g aks-rg -n aks-security2022 \
-  -i ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,calico-system,gatekeeper-system -v
-
-exit
-
-```
 
 Literature:
 
