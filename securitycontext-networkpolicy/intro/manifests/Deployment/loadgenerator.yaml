@@ -20,7 +20,7 @@ spec:
           value: frontend:80
         - name: USERS
           value: "10"
-        image: gcr.io/google-samples/microservices-demo/loadgenerator:v0.1.4
+        image: gcr.io/google-samples/microservices-demo/loadgenerator:v0.3.6
         name: main
         resources:
           limits:
@@ -29,5 +29,22 @@ spec:
           requests:
             cpu: 300m
             memory: 256Mi
+      initContainers:
+      - command:
+        - /bin/sh
+        - -exc
+        - |
+          echo "Init container pinging frontend: ${FRONTEND_ADDR}..."
+          STATUSCODE=$(wget --server-response http://${FRONTEND_ADDR} 2>&1 | awk '/^  HTTP/{print $2}')
+          if test $STATUSCODE -ne 200; then
+              echo "Error: Could not reach frontend - Status code: ${STATUSCODE}"
+              exit 1
+          fi
+        env:
+        - name: FRONTEND_ADDR
+          value: frontend:80
+        image: busybox:latest
+        name: frontend-check
       restartPolicy: Always
+      serviceAccountName: default
       terminationGracePeriodSeconds: 5

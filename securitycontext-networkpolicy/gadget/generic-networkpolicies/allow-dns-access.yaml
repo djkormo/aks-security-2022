@@ -12,6 +12,9 @@ spec:
     - namespaceSelector:
         matchLabels:
           name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
     ports:
-    - protocol: UDP
-      port: 53
+     - port: 53
+       protocol: UDP     

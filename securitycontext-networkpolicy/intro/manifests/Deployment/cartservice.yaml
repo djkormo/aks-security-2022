@@ -15,11 +15,7 @@ spec:
       - env:
         - name: REDIS_ADDR
           value: redis-cart:6379
-        - name: PORT
-          value: "7070"
-        - name: LISTEN_ADDR
-          value: 0.0.0.0
-        image: gcr.io/google-samples/microservices-demo/cartservice:v0.1.4
+        image: gcr.io/google-samples/microservices-demo/cartservice:v0.3.6
         livenessProbe:
           exec:
             command:
@@ -45,4 +41,5 @@ spec:
           requests:
             cpu: 200m
             memory: 64Mi
+      serviceAccountName: default
       terminationGracePeriodSeconds: 5

@@ -11,15 +11,14 @@ spec:
       labels:
         app: cartservice
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
       - env:
         - name: REDIS_ADDR
           value: redis-cart:6379
-        - name: PORT
-          value: "7070"
-        - name: LISTEN_ADDR
-          value: 0.0.0.0
-        image: gcr.io/google-samples/microservices-demo/cartservice:v0.1.4
+        image: gcr.io/google-samples/microservices-demo/cartservice:v0.3.6
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -47,10 +46,12 @@ spec:
             cpu: 200m
             memory: 64Mi
         securityContext:
-        #  runAsNonRoot: true 
+          runAsNonRoot: true 
           readOnlyRootFilesystem: false  # Failed to initialize CoreCLR, HRESULT: 0x80004005
           allowPrivilegeEscalation: false
           capabilities:
             drop:
               - all
+      serviceAccountName: default
+      automountServiceAccountToken: true
       terminationGracePeriodSeconds: 5

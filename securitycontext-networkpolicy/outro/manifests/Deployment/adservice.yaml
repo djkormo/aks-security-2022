@@ -11,6 +11,9 @@ spec:
       labels:
         app: adservice
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
       - env:
         - name: PORT
@@ -19,7 +22,15 @@ spec:
           value: "1"
         - name: DISABLE_TRACING
           value: "1"
-        image: rookout/microservices-demo-adservice:1.0.130
+        image: gcr.io/google-samples/microservices-demo/adservice:v0.3.6
+        imagePullPolicy: Always
+        securityContext:
+          runAsNonRoot: true
+          readOnlyRootFilesystem: false 
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - all
         livenessProbe:
           exec:
             command:
@@ -44,12 +55,9 @@ spec:
           requests:
             cpu: 200m
             memory: 180Mi
-        securityContext:
-        #  runAsNonRoot: true 
-          readOnlyRootFilesystem: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - all
 
+
+
+      serviceAccountName: default
+      automountServiceAccountToken: true
       terminationGracePeriodSeconds: 5

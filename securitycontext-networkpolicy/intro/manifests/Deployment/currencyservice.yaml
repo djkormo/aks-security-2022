@@ -21,7 +21,7 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
-        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.1.4
+        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.3.6
         livenessProbe:
           exec:
             command:
@@ -43,4 +43,5 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
+      serviceAccountName: default
       terminationGracePeriodSeconds: 5

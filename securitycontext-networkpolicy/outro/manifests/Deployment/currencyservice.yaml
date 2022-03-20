@@ -11,6 +11,9 @@ spec:
       labels:
         app: currencyservice
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
       - env:
         - name: PORT
@@ -21,7 +24,7 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
-        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.1.4
+        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.3.6
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -45,10 +48,12 @@ spec:
             cpu: 100m
             memory: 64Mi
         securityContext:
-        #  runAsNonRoot: true 
+          runAsNonRoot: true 
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
           capabilities:
             drop:
               - all
+      serviceAccountName: default
+      automountServiceAccountToken: true
       terminationGracePeriodSeconds: 5

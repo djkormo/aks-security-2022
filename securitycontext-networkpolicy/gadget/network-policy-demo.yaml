@@ -29,6 +29,20 @@ metadata:
 spec:
   egress:
   - ports:
+    - port: 50051
+      protocol: TCP
+    to:
+    - podSelector:
+        matchLabels:
+          app: paymentservice
+  - ports:
+    - port: 5000
+      protocol: TCP
+    to:
+    - podSelector:
+        matchLabels:
+          app: emailservice
+  - ports:
     - port: 7070
       protocol: TCP
     to:
@@ -56,20 +70,6 @@ spec:
     - podSelector:
         matchLabels:
           app: shippingservice
-  - ports:
-    - port: 50051
-      protocol: TCP
-    to:
-    - podSelector:
-        matchLabels:
-          app: paymentservice
-  - ports:
-    - port: 5000
-      protocol: TCP
-    to:
-    - podSelector:
-        matchLabels:
-          app: emailservice
   podSelector:
     matchLabels:
       app: checkoutservice
@@ -132,22 +132,22 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: tigera-operator
+          name: kube-system
       podSelector:
         matchLabels:
-          k8s-app: tigera-operator
-          name: tigera-operator
+          component: kube-proxy
+          tier: node
     ports:
     - port: 8080
       protocol: TCP
   - from:
     - namespaceSelector:
         matchLabels:
-          name: kube-system
+          name: tigera-operator
       podSelector:
         matchLabels:
-          component: kube-proxy
-          tier: node
+          k8s-app: tigera-operator
+          name: tigera-operator
     ports:
     - port: 8080
       protocol: TCP
@@ -213,11 +213,11 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: tigera-operator
+          name: kube-system
       podSelector:
         matchLabels:
-          k8s-app: tigera-operator
-          name: tigera-operator
+          component: kube-proxy
+          tier: node
     ports:
     - port: 6379
       protocol: TCP

@@ -19,7 +19,7 @@ spec:
           value: "1"
         - name: DISABLE_TRACING
           value: "1"
-        image: rookout/microservices-demo-adservice
+        image: gcr.io/google-samples/microservices-demo/adservice:v0.3.6
         livenessProbe:
           exec:
             command:
@@ -44,4 +44,5 @@ spec:
           requests:
             cpu: 200m
             memory: 180Mi
+      serviceAccountName: default
       terminationGracePeriodSeconds: 5

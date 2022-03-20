@@ -1,19 +1,29 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  creationTimestamp: null
   name: redis-cart-network
   namespace: demo
 spec:
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+     - port: 53
+       protocol: UDP 
   ingress:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: tigera-operator
+          name: kube-system
       podSelector:
         matchLabels:
-          k8s-app: tigera-operator
-          name: tigera-operator
+          component: kube-proxy
+          tier: node
     ports:
     - port: 6379
       protocol: TCP

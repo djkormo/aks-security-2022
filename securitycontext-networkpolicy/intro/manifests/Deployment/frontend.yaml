@@ -35,7 +35,7 @@ spec:
           value: "1"
         - name: DISABLE_PROFILER
           value: "1"
-        image: gcr.io/google-samples/microservices-demo/frontend:v0.1.4
+        image: gcr.io/google-samples/microservices-demo/frontend:v0.3.6
         livenessProbe:
           httpGet:
             httpHeaders:
@@ -62,3 +62,4 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
+      serviceAccountName: default
