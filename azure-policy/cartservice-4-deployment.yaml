@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cartservice
+  namespace: demo
+spec:
+  selector:
+    matchLabels:
+      app: cartservice
+  template:
+    metadata:
+      labels:
+        app: cartservice
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - env:
+        - name: REDIS_ADDR
+          value: redis-cart:6379
+        image: gcr.io/google-samples/microservices-demo/cartservice:v0.3.6
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:7070
+            - -rpc-timeout=5s
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        name: server
+        ports:
+        - containerPort: 7070
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:7070
+            - -rpc-timeout=5s
+          initialDelaySeconds: 15
+        resources:
+          limits:
+            cpu: 300m
+            memory: 128Mi
+          requests:
+            cpu: 200m
+            memory: 64Mi
+        securityContext:
+          runAsNonRoot: true 
+          readOnlyRootFilesystem: false  
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - all
+      serviceAccountName: default
+      automountServiceAccountToken: true
+      terminationGracePeriodSeconds: 5

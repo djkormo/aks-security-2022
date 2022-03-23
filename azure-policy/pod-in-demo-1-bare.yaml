@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: redis
+  name: redis
+  namespace: demo
+spec:
+  containers:
+  - image: google-samples/microservices-demo/cartservice:v0.3.6
+    name: server
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
