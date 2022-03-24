@@ -19,6 +19,9 @@ aks-hc check all -g aks-rg -n aks-security2022 \
 aks-hc check all -g aks-rg -n aks-security2022 \
   -i ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,calico-system,gatekeeper-system -v >> logs/aks.log
 
+aks-hc check all -g azuresummit2k22-kp -n aks-security2022 \
+  -i ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,calico-system,gatekeeper-system -v
+
 
 bash bash/run-aks-heath-check.bash -n aks-security2022 -g aks-rg  -i "ingress-nginx,kube-node-lease,kube-public,kube-system,tigera-operator,gatekeeper-system" -l "logs/aks.log"
 
