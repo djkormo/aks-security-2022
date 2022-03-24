@@ -4,38 +4,38 @@
 Create AKS cluster
 
 ```
-bash aks-network-policy-calico-install.bash -n aks-security2021 -g aks-rg -l northeurope -o create
+bash aks-network-policy-calico-install.bash -n aks-security2022 -g aks-rg -l northeurope -o create
 ```
 
 
 You can try script in debug mode
 
 ```
-bash -x aks-network-policy-calico-install.bash -n aks-security2021 -g aks-rg -l northeurope -o create
+bash -x aks-network-policy-calico-install.bash -n aks-security2022 -g aks-rg -l northeurope -o create
 ```
 
 Stop all VMs in AKS cluster
 
 ```
-bash aks-network-policy-calico-install.bash -n aks-security2021 -g aks-rg -l northeurope -o stop
+bash aks-network-policy-calico-install.bash -n aks-security2022 -g aks-rg -l northeurope -o stop
 ```
 
 Start all VMs in AKS cluster
 
 ```
-bash aks-network-policy-calico-install.bash -n aks-security2021 -g aks-rg -l northeurope -o start
+bash aks-network-policy-calico-install.bash -n aks-security2022 -g aks-rg -l northeurope -o start
 ```
 
 Check status of all VMs in AKS cluster
 
 ```
-bash aks-network-policy-calico-install.bash -n aks-security2021 -g aks-rg -l northeurope -o status
+bash aks-network-policy-calico-install.bash -n aks-security2022 -g aks-rg -l northeurope -o status
 ```
 
 Delete AKS cluster
 
 ```
-bash aks-network-policy-calico-install.bash -n aks-security2021 -g aks-rg -l northeurope -o delete
+bash aks-network-policy-calico-install.bash -n aks-security2022 -g aks-rg -l northeurope -o delete
 ```
 
 
@@ -48,7 +48,7 @@ az aks install-cli
 Download kubernetes context file
 
 ```
-az aks get-credentials --name aks-security2021  --resource-group aks-rg --overwrite
+az aks get-credentials --name aks-security2  --resource-group aks-rg --overwrite
 ```
 
 
@@ -95,7 +95,7 @@ No permission ?
 Add myself to admin group for aks cluster 
 
 ```bash
-AKS_NAME=aks-security2021
+AKS_NAME=aks-security2022
 USER_NAME=kormo_gos.pl#EXT#@ITSpec340.onmicrosoft.com
 GROUP_NAME="${AKS_NAME}AdminGroup"
 USER_ID=$(az ad user show --id $USER_NAME --query objectId --output tsv)  
@@ -165,7 +165,7 @@ Bonus
 Download context file in admin mode
 
 ```
-az aks get-credentials --name aks-security2021 --resource-group aks-rg --admin
+az aks get-credentials --name aks-security2022 --resource-group aks-rg --admin
 ```
 
 and check permissions 
